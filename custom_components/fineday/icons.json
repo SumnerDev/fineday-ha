@@ -1,0 +1,25 @@
+{
+  "entity": {
+    "sensor": {
+      "today": {
+        "default": "mdi:hanger",
+        "state": {
+          "yes": "mdi:weather-sunny",
+          "maybe": "mdi:weather-partly-cloudy",
+          "no": "mdi:weather-pouring"
+        }
+      },
+      "tomorrow": {
+        "default": "mdi:hanger",
+        "state": {
+          "yes": "mdi:weather-sunny",
+          "maybe": "mdi:weather-partly-cloudy",
+          "no": "mdi:weather-pouring"
+        }
+      },
+      "dry_days": {
+        "default": "mdi:calendar-check"
+      }
+    }
+  }
+}

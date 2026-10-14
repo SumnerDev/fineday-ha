@@ -1,0 +1,86 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Fine Day",
+        "description": "Fine Day tells you whether today is a good day to dry the washing, or paint, or mow. It needs a key from SumnerD: email {contact} about Fine Day for one. The server address is already filled in.",
+        "data": {
+          "api_url": "Server address",
+          "api_key": "API key"
+        }
+      },
+      "place": {
+        "title": "Where are you?",
+        "description": "Type your suburb, or your town if it's a small one. Any NZ suburb or locality works, macrons optional.",
+        "data": {
+          "query": "Suburb or town"
+        }
+      },
+      "pick": {
+        "title": "Which one?",
+        "description": "Only the first 20 matches show. If yours isn't here, pick None of these and search again.",
+        "data": {
+          "place": "Place"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Fine Day needs a new key",
+        "description": "The server no longer accepts this key. Enter the new one, or email {contact} about Fine Day for a key.",
+        "data": {
+          "api_key": "API key"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "That key isn't valid, or has been revoked.",
+      "cannot_connect": "Couldn't reach the server. Check the address.",
+      "rate_limited": "This key has used its requests for today. Try again after midnight.",
+      "invalid_url": "The address should start with https://",
+      "no_match": "Nothing matched. Try a different spelling, or the nearest town.",
+      "address_blocked": "The server won't take this key from here (it's locked to another address, or it's been used from too many places today). Email hello@sumnerd.co.nz about Fine Day."
+    },
+    "abort": {
+      "already_configured": "That place is already set up.",
+      "reauth_successful": "Key updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Fine Day",
+        "data": {
+          "daylight_only": "Daylight hours only"
+        },
+        "data_description": {
+          "daylight_only": "Only look for dry windows between sunrise and sunset."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "today": {
+        "name": "Today",
+        "state": {
+          "yes": "Yes",
+          "maybe": "Maybe",
+          "no": "No"
+        }
+      },
+      "tomorrow": {
+        "name": "Tomorrow",
+        "state": {
+          "yes": "Yes",
+          "maybe": "Maybe",
+          "no": "No"
+        }
+      },
+      "next_dry_window": {
+        "name": "Next dry window"
+      },
+      "dry_days": {
+        "name": "Dry days ahead"
+      }
+    }
+  }
+}
