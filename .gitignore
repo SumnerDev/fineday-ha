@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+# zips of the folder for sending to people, and anything secret
+/*.zip
+artifacts/
