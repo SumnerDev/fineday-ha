@@ -42,6 +42,7 @@ class FineDayConfigFlow(ConfigFlow, domain=DOMAIN):
         self._url = DEFAULT_API_URL
         self._key = ""
         self._results: list[dict[str, Any]] = []
+        self._home: dict[str, Any] | None = None
 
     def _api(self, url, key):
         return FineDayApi(async_get_clientsession(self.hass), url, key)
@@ -66,7 +67,7 @@ class FineDayConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is None and current:
             self._url = current[0].data[CONF_API_URL]
             self._key = current[0].data[CONF_API_KEY]
-            return await self.async_step_place()
+            return await self.async_step_where()
 
         errors = {}
         if user_input is not None:
@@ -78,7 +79,7 @@ class FineDayConfigFlow(ConfigFlow, domain=DOMAIN):
                 errors["base"] = err
             else:
                 self._url, self._key = url, key
-                return await self.async_step_place()
+                return await self.async_step_where()
 
         schema = vol.Schema({
             vol.Required(CONF_API_URL, default=self._url): TextSelector(TextSelectorConfig(type=TextSelectorType.URL)),
@@ -86,6 +87,50 @@ class FineDayConfigFlow(ConfigFlow, domain=DOMAIN):
         })
         return self.async_show_form(step_id="user", data_schema=schema, errors=errors,
                                     description_placeholders={"contact": KEY_CONTACT})
+
+    def _home_spot(self):
+        # HA's home, rounded to 2dp (~1km). None if it isn't in NZ (never set, or overseas)
+        lat, lon = round(self.hass.config.latitude, 2), round(self.hass.config.longitude, 2)
+        in_nz = -53 <= lat <= -28 and (160 <= lon <= 180 or -180 <= lon <= -175)
+        return (lat, lon) if in_nz else None
+
+    async def async_step_where(self, user_input=None) -> ConfigFlowResult:
+        # offer home or search. nothing about home leaves HA until they pick it
+        if self._home_spot() is None:
+            return await self.async_step_place()
+        return self.async_show_menu(step_id="where", menu_options=["home", "place"])
+
+    async def async_step_home(self, user_input=None) -> ConfigFlowResult:
+        lat, lon = self._home_spot()
+        try:
+            near = await self._api(self._url, self._key).nearest(lat, lon)
+        except FineDayAuthError:
+            return self._place_form({"base": "invalid_auth"})
+        except FineDayAddressError:
+            return self._place_form({"base": "address_blocked"})
+        except FineDayLimitError:
+            return self._place_form({"base": "rate_limited"})
+        except FineDayError:
+            return self._place_form({"base": "cannot_connect"})
+        if not near:
+            return self._place_form({"base": "no_home_match"})
+        self._home = near[0]
+        return await self.async_step_home_confirm()
+
+    async def async_step_home_confirm(self, user_input=None) -> ConfigFlowResult:
+        # show them which suburb before making anything
+        return self.async_show_menu(
+            step_id="home_confirm",
+            menu_options=["home_ok", "place"],
+            description_placeholders={"home": place_label(self._home["suburb"], self._home["city"])},
+        )
+
+    async def async_step_home_ok(self, user_input=None) -> ConfigFlowResult:
+        return await self._make_entry(self._home)
+
+    def _place_form(self, errors=None):
+        return self.async_show_form(step_id="place", data_schema=vol.Schema({vol.Required("query"): str}),
+                                    errors=errors or {})
 
     async def async_step_place(self, user_input=None) -> ConfigFlowResult:
         errors = {}
@@ -108,8 +153,7 @@ class FineDayConfigFlow(ConfigFlow, domain=DOMAIN):
                 else:
                     return await self.async_step_pick()
 
-        return self.async_show_form(step_id="place", data_schema=vol.Schema({vol.Required("query"): str}),
-                                    errors=errors)
+        return self._place_form(errors)
 
     async def async_step_pick(self, user_input=None) -> ConfigFlowResult:
         if user_input is not None:

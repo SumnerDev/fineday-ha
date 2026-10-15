@@ -9,6 +9,22 @@
           "api_key": "API key"
         }
       },
+      "where": {
+        "title": "Which place?",
+        "description": "Use the suburb nearest the home you set in Home Assistant, or search for one. Your home location only goes out if you pick it, rounded to about 1 km.",
+        "menu_options": {
+          "home": "Use my home location",
+          "place": "Search for a place"
+        }
+      },
+      "home_confirm": {
+        "title": "Is this it?",
+        "description": "Your Home Assistant's home is in or near {home}.",
+        "menu_options": {
+          "home_ok": "Yes, use that",
+          "place": "No, search for a place"
+        }
+      },
       "place": {
         "title": "Where are you?",
         "description": "Type your suburb, or your town if it's a small one. Any NZ suburb or locality works, macrons optional.",
@@ -37,6 +53,7 @@
       "rate_limited": "This key has used its requests for today. Try again after midnight.",
       "invalid_url": "The address should start with https://",
       "no_match": "Nothing matched. Try a different spelling, or the nearest town.",
+      "no_home_match": "Couldn't find a suburb near your Home Assistant's home. Search for one instead.",
       "address_blocked": "The server won't take this key from here (it's locked to another address, or it's been used from too many places today). Email hello@sumnerd.co.nz about Fine Day."
     },
     "abort": {

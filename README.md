@@ -24,7 +24,7 @@ Then add it here, or go to Settings > Devices & services > Add integration > Fin
 
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=fineday)
 
-The server address is already filled in (`https://fineday-api.sumnerd.co.nz`), so paste your key, type your suburb, pick it from the list. Add more suburbs the same way, it won't ask for the key again.
+The server address is already filled in (`https://fineday-api.sumnerd.co.nz`), so paste your key. Then either use your home location (Fine Day finds the suburb nearest the home you set in Home Assistant) or search for a place. Add more places the same way, it won't ask for the key again.
 
 ## Sensors
 
@@ -64,7 +64,11 @@ actions:
 
 ### The Fine Day card
 
-This is the Fine Day website in a Webpage card, so it doesn't need a key, or even the integration. Edit your dashboard, add a Webpage card, hit Show code editor and paste:
+This is the Fine Day website in a Webpage card, so it doesn't need a key, or even the integration.
+
+Easiest way: make it at [sumnerd.co.nz/fineday/card](https://www.sumnerd.co.nz/fineday/card/). Find your place (or use your location), check the preview, copy the code, then in HA edit your dashboard, add a Webpage card, hit Show code editor and paste it in.
+
+Or by hand, paste this and change the place:
 
 ```yaml
 type: iframe
@@ -117,8 +121,8 @@ Tap a row for the summary and dry windows.
 
 - If your key gets revoked or replaced, HA flags Fine Day under Settings > Devices & services and asks you for the new one.
 - Each key has a daily request limit. Normal use is about 12 requests a day per suburb so you won't get near it.
-- A key is for one household. The server counts the internet connections a key is used from, and after a few in a day it turns new ones away until midnight.
-- What the server sees: your key, the suburb you picked (its centre point, not your address) and your IP address.
+- A key is for one household. The server notes the IP addresses a key's used from that day (wiped the next day), and after a few in a day it turns new ones away until midnight.
+- What the server sees: your key, the suburb you picked (its centre point, not your address) and your IP address. Your home location only goes out if you pick "Use my home location", rounded to about 1 km, just to find the nearest suburb.
 - Forecast data from [Open-Meteo](https://open-meteo.com), places from LINZ (CC BY 4.0).
 
 ## Licence

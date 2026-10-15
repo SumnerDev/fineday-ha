@@ -63,6 +63,11 @@ class FineDayApi:
         body = await self._get("/v1/search", {"q": query})
         return list(body.get("results", []))
 
+    async def nearest(self, lat: float, lon: float) -> list[dict[str, Any]]:
+        # closest places to a point, nearest first. only ever send it rounded (~1km)
+        body = await self._get("/v1/search", {"lat": f"{lat:.2f}", "lon": f"{lon:.2f}"})
+        return list(body.get("results", []))
+
     async def forecast(self, lat: float, lon: float, name: str | None, daylight_only: bool = True) -> dict[str, Any]:
         params = {"lat": f"{lat:.5f}", "lon": f"{lon:.5f}", "daylight": "1" if daylight_only else "0"}
         if name:

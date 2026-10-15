@@ -43,6 +43,60 @@ async def test_pick_none_of_these_goes_back(hass: HomeAssistant, aioclient_mock:
     assert result["step_id"] == "place"  # back to the search, key kept
 
 
+def _sent_home(mock) -> bool:
+    return any("lat" in url.query for _, url, _, _ in mock.mock_calls)
+
+
+async def test_home_location(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+    hass.config.latitude, hass.config.longitude = -41.2251, 174.8862  # somewhere in petone
+    aioclient_mock.get(f"{URL}/v1/search", json=load("search_one.json"))
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_API_URL: URL, CONF_API_KEY: KEY})
+    assert result["type"] is FlowResultType.MENU and result["step_id"] == "where"
+    assert not _sent_home(aioclient_mock)  # nothing about home goes out until they pick it
+
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"next_step_id": "home"})
+    _, url, _, _ = aioclient_mock.mock_calls[-1]
+    assert (url.query["lat"], url.query["lon"]) == ("-41.23", "174.89")  # rounded, ~1km
+    assert result["type"] is FlowResultType.MENU and result["step_id"] == "home_confirm"
+    assert result["description_placeholders"]["home"] == "Petone, Lower Hutt"
+
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"next_step_id": "home_ok"})
+    assert result["type"] is FlowResultType.CREATE_ENTRY and result["title"] == "Petone, Lower Hutt"
+
+
+async def test_search_instead_sends_no_location(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+    hass.config.latitude, hass.config.longitude = -41.2251, 174.8862
+    aioclient_mock.get(f"{URL}/v1/search", json=load("search_one.json"))
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_API_URL: URL, CONF_API_KEY: KEY})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"next_step_id": "place"})
+    assert result["step_id"] == "place"
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"query": "petone"})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert not _sent_home(aioclient_mock)
+
+
+async def test_home_outside_nz_skips_the_menu(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+    # the test HA lives in San Diego, like a fresh install that never set a home
+    aioclient_mock.get(f"{URL}/v1/search", json=load("search_one.json"))
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_API_URL: URL, CONF_API_KEY: KEY})
+    assert result["step_id"] == "place"
+    assert not _sent_home(aioclient_mock)
+
+
+async def test_home_already_set_up(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+    hass.config.latitude, hass.config.longitude = -41.2251, 174.8862
+    MockConfigEntry(domain=DOMAIN, unique_id=UNIQUE_ID, data=ENTRY_DATA).add_to_hass(hass)
+    aioclient_mock.get(f"{URL}/v1/search", json=load("search_one.json"))
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
+    assert result["step_id"] == "where"  # second place, no key screen
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"next_step_id": "home"})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"next_step_id": "home_ok"})
+    assert result["type"] is FlowResultType.ABORT and result["reason"] == "already_configured"
+
+
 async def test_single_match_skips_pick(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
     aioclient_mock.get(f"{URL}/v1/search", json=load("search_one.json"))
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
