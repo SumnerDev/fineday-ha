@@ -70,13 +70,17 @@ This is the Fine Day website in a Webpage card, so it doesn't need a key, or eve
 type: iframe
 url: https://www.sumnerd.co.nz/fineday/embed/?q=Petone&theme=auto
 aspect_ratio: 120%
+grid_options:
+  rows: 8
 ```
+
+`grid_options` sets the height in a sections view (the default for new dashboards) and `aspect_ratio` does it in a masonry view, each ignores the other. Shorter than that and you only see today.
 
 Change `Petone` to your suburb, then check the name at the top of the card is the place you meant:
 
-- Use your suburb, not the city. `q=Hamilton` on its own won't find your bit of Hamilton.
-- Put the macrons in, the way it's spelt on the map: `q=Taupō`.
-- If the name's used in more than one town, add the town after a comma: `q=Hillcrest,+Hamilton`.
+- Use your suburb, not the city. `q=Hamilton` on its own gets you Hamilton Central.
+- Macrons are optional, `q=Taupo` finds Taupō, and Mt, Pt and St work too (`q=Mt+Eden`).
+- If the name's used in more than one town, add the town after a comma: `q=Hillcrest,+Hamilton`. If that town hasn't got one, the card says so and tells you which towns have.
 - Still not right? Give it the spot instead: `?lat=-41.2259&lon=174.8855&suburb=Petone`.
 
 Other settings go on the end with `&`:
@@ -88,8 +92,6 @@ Other settings go on the end with `&`:
 | `days` | how many days to list under today, 1 to 14 | 14 |
 | `daylight=0` | scores every hour, not just sunrise to sunset | daylight only |
 | `refresh` | minutes between refreshes, 10 to 1440 | 120 |
-
-One card per view for now: two load at the same moment and one can show an error until you tap Try again.
 
 ### Your own card
 
