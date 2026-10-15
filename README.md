@@ -2,7 +2,7 @@
 
 Is today a good day to get the washing out? [Fine Day](https://www.sumnerd.co.nz/fineday/) scores every daylight hour on rain, humidity, temperature and wind and gives you a Yes / Maybe / No. This brings that into HA as sensors so you can actually do something with it (nag me when tomorrow's a Yes, that kind of thing).
 
-NZ only, same as the app. Only after the card on your dashboard? That doesn't need a key, see [On your dashboard](#on-your-dashboard).
+NZ only, same as the app. Only after the card on your dashboard? The website's version doesn't need a key, see [Without the integration](#without-the-integration).
 
 <p>
   <img src="https://raw.githubusercontent.com/SumnerDev/fineday-ha/master/images/card-light.png" alt="The Fine Day card for Petone, light theme: No, not today, with tomorrow and the next few days below" width="49%">
@@ -69,7 +69,28 @@ actions:
 
 ### The Fine Day card
 
-This is the Fine Day website in a Webpage card, so it doesn't need a key, or even the integration.
+The integration comes with a card. Edit your dashboard, pick **Add card** and search for **Fine Day**. It's already set to your first place, so add it and you're done. On HA 2026.6 or newer it also turns up as a suggestion when you pick one of the Fine Day sensors under **By entity**.
+
+![Add to dashboard, By card: searching Fine Day finds the Fine Day card, already showing Petone](https://raw.githubusercontent.com/SumnerDev/fineday-ha/master/images/add-card.png)
+
+In its settings you can pick another place, pin it to light or dark, and say how many days to list under today. Left alone it matches HA's light or dark, and it always follows the daylight setting you picked for that place.
+
+![The Fine Day card's settings: place, theme and days, with a preview](https://raw.githubusercontent.com/SumnerDev/fineday-ha/master/images/card-settings.png)
+
+Just added your first place and it's not in the list? Refresh the page, the card loads with the page.
+
+Or in YAML:
+
+```yaml
+type: custom:fineday-card
+entity: sensor.fine_day_petone_lower_hutt_today
+theme: dark  # light or dark, leave it out to match HA
+days: 7      # days to list under today, 1 to 14
+```
+
+### Without the integration
+
+The same card is on the Fine Day website, so you can put it in a Webpage card without a key, or the integration.
 
 Easiest way: make it at [sumnerd.co.nz/fineday/card](https://www.sumnerd.co.nz/fineday/card/). Find your place (or use your location), check the preview, copy the code, then in HA edit your dashboard, add a Webpage card, hit Show code editor and paste it in.
 
@@ -128,6 +149,7 @@ Tap a row for the summary and dry windows.
 - Each key has a daily request limit. Normal use is about 12 requests a day per suburb so you won't get near it.
 - A key is for one household. The server notes the IP addresses a key's used from that day (wiped the next day), and after a few in a day it turns new ones away until midnight.
 - What the server sees: your key, the suburb you picked (its centre point, not your address) and your IP address. Your home location only goes out if you pick "Use my home location", rounded to about 1 km, just to find the nearest suburb.
+- The Fine Day card shows the Fine Day website in a frame, same as the Webpage card, so the website sees the place you picked (its centre point again) and your IP address. It's not told your HA's address.
 - Forecast data from [Open-Meteo](https://open-meteo.com), places from LINZ (CC BY 4.0).
 
 ## Licence

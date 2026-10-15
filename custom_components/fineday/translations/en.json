@@ -59,6 +59,9 @@
     "abort": {
       "already_configured": "That place is already set up.",
       "reauth_successful": "Key updated."
+    },
+    "create_entry": {
+      "default": "All set. To put Fine Day on a dashboard, edit the dashboard, pick **Add card** and search for **Fine Day**. Just added your first place? Refresh the page first so the card shows up."
     }
   },
   "options": {
