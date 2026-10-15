@@ -4,6 +4,11 @@ Is today a good day to get the washing out? [Fine Day](https://www.sumnerd.co.nz
 
 NZ only, same as the app. Only after the card on your dashboard? That doesn't need a key, see [On your dashboard](#on-your-dashboard).
 
+<p>
+  <img src="https://raw.githubusercontent.com/SumnerDev/fineday-ha/master/images/card-light.png" alt="The Fine Day card for Petone, light theme: No, not today, with tomorrow and the next few days below" width="49%">
+  <img src="https://raw.githubusercontent.com/SumnerDev/fineday-ha/master/images/card-dark.png" alt="The same card in the dark theme" width="49%">
+</p>
+
 ## You need a key
 
 The forecast is worked out on the Fine Day server, so you need an API key. Email **hello@sumnerd.co.nz** about Fine Day and I'll sort you one.
